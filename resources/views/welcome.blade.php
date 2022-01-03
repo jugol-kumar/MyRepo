@@ -6,6 +6,7 @@
 
         <title>Laravel</title>
 {{--        <link rel="stylesheet" href="{{ asset('css/app.css') }}">--}}
+        <link href="https://cdn.jsdelivr.net/npm/vuetify@1.x/dist/vuetify.min.css" rel="stylesheet">
         <link rel="stylesheet" href="./css/all.css">
 
         <script>

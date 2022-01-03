@@ -10,7 +10,8 @@ class AirlinesController extends Controller
 {
     // get data
     public function index(Request $request){
-        $airlines        = Airline::orderBy("id", "DESC")->paginate($request->total);
+        $airlines        = Airline::orderBy("id", "ASC")->get();
+//        $airlines        = Airline::orderBy("id", "DESC")->paginate($request->total);
         return response()->json(["status" =>true, "data"=>$airlines], 200);
     }
 
@@ -21,7 +22,7 @@ class AirlinesController extends Controller
         ]);
         Airline::create([
             'name'        => $request->name,
-            'description' => $request->details
+            'description' => $request->description
         ]);
         return response()->json(["success"=>true], 200);
     }

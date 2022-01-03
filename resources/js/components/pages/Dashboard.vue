@@ -1,193 +1,197 @@
 <template>
-    <div>
-        <div class="content">
-            <div class="container-fluid">
-                <!--~~~~~~~ TABLE ONE ~~~~~~~~~-->
-                <div class="_1adminOverveiw_table_recent _box_shadow _border_radious _mar_b30 _p20">
-                    <p class="_title0">Users <Button @click="addModal=true" class="float-right"><icon type="md-add" />Add user</Button></p>
+    <v-main>
+        <v-container
+            class="py-8 px-6"
+            fluid>
+            <v-layout column align-center>
+                <v-row>
+                    <v-col cols="12">
+                        <v-text-field
+                            v-model="search"
+                            append-icon="mdi-magnify"
+                            label="Search"
+                        ></v-text-field>
+                        <v-data-table
+                            :headers="headers"
+                            :items="desserts"
+                            sort-by="calories"
+                            class="elevation-1"
+                            :search="search"
+                        >
 
-                    <div class="_overflow _table_div">
-                        <table class="_table">
-                            <!-- TABLE TITLE -->
-                            <tr>
-                                <th>#Id</th>
-                                <th>User Name</th>
-                                <th>Description</th>
-                                <th>Created At</th>
-                                <th>Action</th>
-                            </tr>
-                            <!-- TABLE TITLE -->
-                            <!-- ITEMS -->
-                            <tr v-for="(admin, i) in allUser" :key="i" v-if="allUser.length">
-                                <td>{{ i+1 }}</td>
-                                <td class="">{{admin.name}}</td>
-                                <td>{{ admin.description }}</td>
-                                <td>{{ admin.created_at|dateFormat }}</td>
-                                <td>
-                                    <Button v-model="editData.id" type="success" size="small" @click="showEditModal(admin)"><Icon type="md-pricetags"/></Button>
-                                    <Button type="error" @click="deleteTag(admin)" size="small"><Icon type="md-trash"/></Button>
-                                </td>
-                            </tr>
-                            <!-- ITEMS -->
-                        </table>
-                        <div class="space">
 
-                            <Page :total="paginateInfo.total" :current="paginateInfo.current_page" @on-change="allUsers" :page-size="parseInt(paginateInfo.per_page)"/>
-                        </div>
-                    </div>
-                </div>
 
-                <Modal
-                    v-model="addModal"
-                    title="Add User"
-                    :mask-closable="false"
-                    :closable="false"
-                >
-                    <div class="space">
-                        <Input type="text" v-model="data.name" placeholder="Enter full name..." />
-                    </div>
-                    <div class="space">
-                        <Input v-model="data.details" type="textarea" :rows="10" placeholder="Enter something..." />
-                    </div>
-                    <div slot="footer">
-                        <Button type="primary" @click="addUser()"  :disabled="isAdding" :loading="isAdding">{{isAdding ? 'Adding...' : 'Add User'}}</Button>
-                        <Button type="default" @click="addModal=false">close</Button>
-                    </div>
-                </Modal>
+                            <template v-slot:top>
+                                <v-toolbar
+                                    flat
+                                >
+                                    <v-dialog
+                                        v-model="dialog"
+                                        max-width="550px"
+                                    >
+                                        <template v-slot:activator="{ on, attrs }">
+                                            <v-btn
+                                                color="primary"
+                                                dark
+                                                class="mb-2"
+                                                v-bind="attrs"
+                                                v-on="on"
+                                            >
+                                                New Item
+                                            </v-btn>
+                                        </template>
+                                        <v-card>
+                                            <v-card-title>
+                                                <span class="text-h5">{{ formTitle }}</span>
+                                            </v-card-title>
 
-                <Modal
-                    v-model="editModal"
-                    title="Edit Tag"
-                    :mask-closable="false"
-                    :closable="false"
-                >
-                    <div class="space">
-                        <Input type="text" v-model="editData.name" placeholder="Enter full name..." />
-                    </div>
-                    <div class="space">
-                        <Input v-model="editData.description" type="textarea" :rows="10" placeholder="Enter something..." />
-                    </div>
-                    <div slot="footer">
-                        <Button type="primary" @click="editTag()"  :disabled="isAdding" :loading="isAdding">{{isAdding ? 'Adding...' : 'Edit User'}}</Button>
-                        <Button type="default" @click="editModal=false">close</Button>
-                    </div>
-                </Modal>
+                                            <v-card-text>
+                                                <v-container>
+                                                    <v-row>
+                                                        <v-col
+                                                            cols="12"
+                                                            sm="6"
+                                                            md="12"
+                                                        >
+                                                            <v-text-field
+                                                                v-model="editedItem.name"
+                                                                label="Dessert name"
+                                                                hide-details="auto"
+                                                            ></v-text-field>
+                                                        </v-col>
+                                                        <v-col
+                                                            cols="12"
+                                                            sm="6"
+                                                            md="12"
+                                                        >
+                                                        </v-col>
+                                                        <v-textarea
+                                                            name="input-7-1"
+                                                            filled
+                                                            label="Label"
+                                                            auto-grow
+                                                            v-model="editedItem.description"
+                                                        ></v-textarea>
+                                                    </v-row>
+                                                </v-container>
+                                            </v-card-text>
 
-            </div>
-        </div>
-    </div>
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn
+                                                    color="blue darken-1"
+                                                    text
+                                                    @click="close"
+                                                >
+                                                    Cancel
+                                                </v-btn>
+                                                <v-btn
+                                                    color="blue darken-1"
+                                                    text
+                                                    @click="save"
+                                                >
+                                                    Save
+                                                </v-btn>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-dialog>
+                                    <v-dialog v-model="dialogDelete" max-width="500px">
+                                        <v-card>
+                                            <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
+                                            <v-card-actions>
+                                                <v-spacer></v-spacer>
+                                                <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
+                                                <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                                                <v-spacer></v-spacer>
+                                            </v-card-actions>
+                                        </v-card>
+                                    </v-dialog>
+                                </v-toolbar>
+                            </template>
+                            <template v-slot:item.actions="{ item }">
+                                <v-icon
+                                    small
+                                    class="mr-2"
+                                    @click="editItem(item)"
+                                >
+                                    mdi-pencil
+                                </v-icon>
+                                <v-icon
+                                    small
+                                    @click="deleteItem(item)"
+                                >
+                                    mdi-delete
+                                </v-icon>
+                            </template>
+
+                            <template v-slot:no-data>
+                                <v-btn
+                                    color="primary"
+                                    @click="initialize"
+                                >
+                                    Reset
+                                </v-btn>
+                            </template>
+                        </v-data-table>
+                    </v-col>
+                </v-row>
+            </v-layout>
+        </v-container>
+    </v-main>
 </template>
 
 <script>
-
 export default {
-    data () {
-        return {
-            data: {
-                name : "",
-                details:"",
+    data: () => ({
+        cards: ['Today', 'Yesterday'],
+        drawer: true,
+        search: '',
+        actionLogin: false,
+        dialog: false,
+        dialogDelete: false,
+        headers: [
+            {
+                text: 'id',
+                align: 'left',
+                sortable: false,
+                value: 'id',
             },
-            addModal: false,
-            editModal: false,
-            isAdding: false,
-            allUser : [],
-            paginateInfo:null,
-            total:5,
-            editData: {
-                name: "",
-                description:"",
-                id:"",
-            }
-        }
+            { text: 'Name', value: 'name' },
+            { text: 'Description', value: 'description'},
+            { text: 'Actions', value: 'actions', sortable: false },
+        ],
+        desserts: [],
+        editedIndex: -1,
+        editedItem: {
+            name: '',
+            description: "",
+        },
+
+        defaultItem: {
+            name: '',
+            calories: 0,
+            fat: 0,
+            carbs: 0,
+            protein: 0,
+        },
+    }),
+    computed: {
+        formTitle () {
+            return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+        },
     },
-    methods: {
-        async addUser(){
-            if (this.data.name.trim() == "") return this.e('User name is Required','Opps')
-            const res = await this.callApi('post', 'api/add-user', this.data)
-            if (res.status === 200){
-                console.log(res.data);
-                this.allUser.unshift(res.data)
-                this.s('Tag Added Successfully Done..', 'Success')
-                this.addModal = false
-                this.data.name =""
-                this.data.details=""
-                this.allUsers()
-            }else{
-                if (res.status == 422){
-                    console.log(res.data);
-                    for (let i=0; i< res.data.errors.length; i++){
-                        console.log(res.data.errors[i])
-                        // this.i(res.data.errors[i][0], 'Opps');
-                    }
-                    // if (res.data.errors.tagName){
-                    //     this.i(res.data.errors.tagName[0], 'Opps..')
-                    // }
-                }
-                this.swr()
-            }
-        },
-        async allUsers(page=1){
-            const res = await this.callApi('get', `api/all-user?page=${page}&total=${this.total}`,);
-            if (res.status == 200){
-                this.allUser = res.data.data.data
-                this.paginateInfo = res.data
-            }else{
-                this.swr();
-                this.addModal = false
-            }
-        },
 
-        async showEditModal(user){
-            this.editData.name = user.name;
-            this.editData.description = user.description;
-            this.editData.id = user.id
-                this.editModal = true
+    watch: {
+        dialog (val) {
+            val || this.close()
         },
-
-        async editTag(){
-            const res = await this.callApi('post', 'api/edit-user', this.editData)
-            if (res.status === 200 ){
-                this.s('Tag Updated Successfully Done..', 'Success')
-                this.editModal = false
-                this.allUsers()
-            }
+        dialogDelete (val) {
+            val || this.closeDelete()
         },
-
-        async deleteTag(user){
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#52b6ff',
-                cancelButtonColor: '#e85c5c',
-                confirmButtonText: "Delete"
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    const res = await this.callApi('post', 'api/delete-user', user)
-                    if (res.status === 200){
-                        this.s('Tag Delete Successfully Done..', 'Success')
-                        this.allUsers()
-                    }else{
-                        this.swr()
-                    }
-                }
-            })
-        },
-
-        // async getPageData(page=1){
-        //     const res = await this.callApi("get", "api/pageData")
-        //     .then(res =>{
-        //
-        //     })
-        //     .catch(err=>{
-        //
-        //     })
-        // },
-
     },
-    mounted() {
-        this.allUsers()
+
+    created () {
+        this.initialize();
         if (this.$store.state.token) {
             this.$store.commit("showSideTop", true);
             this.$router.push("/");
@@ -195,6 +199,83 @@ export default {
             this.$store.commit("showSideTop", false);
             this.$router.push("/login")
         }
-    }
+    },
+    methods: {
+        async initialize() {
+            const res = await this.callApi('get', `api/all-user`,);
+            if (res.status == 200) {
+                this.desserts = res.data.data
+                console.log(res.data.data);
+            } else {
+                this.swr();
+                this.addModal = false
+            }
+        },
+
+        editItem (item) {
+            this.editedIndex = this.desserts.indexOf(item)
+            this.editedItem = Object.assign({}, item)
+            this.dialog = true
+        },
+
+        deleteItem (item) {
+            this.editedIndex = this.desserts.indexOf(item)
+            this.editedItem = Object.assign({}, item)
+            this.dialogDelete = true
+        },
+
+        async deleteItemConfirm() {
+            const res = await this.callApi('post', 'api/delete-user', this.editedItem)
+            if (res.status === 200) {
+                this.s('Data Deleted Successfully Done..', 'Success')
+                this.editModal = false
+                this.closeDelete ();
+                this.initialize();
+            } else {
+                this.swr("Have an error! try again later", "Error")
+            }
+        },
+
+        close () {
+            this.dialog = false
+            this.$nextTick(() => {
+                this.editedItem = Object.assign({}, this.defaultItem)
+                this.editedIndex = -1
+            })
+        },
+
+        closeDelete () {
+            this.dialogDelete = false
+            this.$nextTick(() => {
+                this.editedItem = Object.assign({}, this.defaultItem)
+                this.editedIndex = -1
+            })
+        },
+
+        async save() {
+            if (this.editedIndex > -1) {
+                const res = await this.callApi('post', 'api/edit-user', this.editedItem)
+                if (res.status === 200) {
+                    this.s('Data Updated Successfully Done..', 'Success')
+                    this.editModal = false
+                    this.close();
+                    this.initialize()
+                }else{
+                    this.e(res.data.errors.name[0], "Error")
+                }
+            } else {
+                const res = await this.callApi('post', 'api/add-user', this.editedItem)
+                if (res.status === 200) {
+                    this.s('Data Save Successfully Done', 'Success')
+                    this.editModal = false
+                    this.close();
+                    this.initialize()
+                }else{
+                    this.e(res.data.errors.name[0], "Error")
+                }
+            }
+            this.close()
+        }
+    },
 }
 </script>

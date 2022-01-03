@@ -10,7 +10,10 @@ import 'view-design/dist/styles/iview.css';
 import Vuex from 'vuex';
 import Swal from "sweetalert2";
 import {storeUser} from './store/index'
-
+import "vuetify/dist/vuetify.min.css";
+import vuetify from "../plagins/vuetify";
+import 'vuetify/dist/vuetify.min.css'
+import "material-design-icons-iconfont"
 
 
 Vue.use(ViewUI)
@@ -75,6 +78,7 @@ Vue.component('app', require('./components/App.vue').default);
 
 const app = new Vue({
     el: '#app',
+    vuetify:vuetify,
     router:Router,
     store:storeUser,
 });
