@@ -55,7 +55,7 @@
                                                         >
                                                             <v-text-field
                                                                 v-model="editedItem.name"
-                                                                label="Dessert name"
+                                                                label="Airlines name"
                                                                 hide-details="auto"
                                                             ></v-text-field>
                                                         </v-col>
@@ -68,7 +68,7 @@
                                                         <v-textarea
                                                             name="input-7-1"
                                                             filled
-                                                            label="Label"
+                                                            label="Airlines description"
                                                             auto-grow
                                                             v-model="editedItem.description"
                                                         ></v-textarea>
